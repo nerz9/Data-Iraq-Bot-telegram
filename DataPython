@@ -1,0 +1,23 @@
+import pandas as pd
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
+# قراءة ملف اكسل
+df = pd.read_excel('اسم_الملف.xlsx')
+
+
+def search_name(update, context):
+    name = update.message.text
+    result = df[df['اسم العميل'] == name]
+    if not result.empty:
+        response = result.to_string(index=False)
+    else:
+        response = 'الاسم غير موجود في قاعدة البيانات'
+
+    update.message.reply_text(response)
+
+updater = Updater('TOKEN', use_context=True)
+dp = updater.dispatcher
+dp.add_handler(MessageHandler(Filters.text & ~Filters.command, search_name))
+
+updater.start_polling()
+updater.idle()
